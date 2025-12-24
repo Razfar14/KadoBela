@@ -129,24 +129,22 @@
         <div class="slide bg-5">
             <h2>HBD!</h2>
             <img src="foto_bersama.jpg" alt="Foto Bersama" class="photo-frame" onerror="this.style.display='none'">
-            <p>Kami Semua mengucappkan selamat ulang tahun Bela</p>
+            <p>Kami Semua mengucapkan selamat ulang tahun Bela</p>
             <p style="font-size: 0.8em; margin-top: 30px; opacity: 0.7;">Tap kiri/kanan untuk geser<br>Tahan layar untuk pause</p>
         </div>
     </div>
 
     <script>
-        // === 1. KONFIGURASI PETA LAGU (PENTING) ===
-        // Kiri: Index Slide (Mulai dari 0) | Kanan: ID Audio
+        // === 1. KONFIGURASI PETA LAGU ===
         const slideAudioMap = {
-            0: 0, // Slide 1 -> audio-0
-            1: 1, // Slide 2 -> audio-1
-            2: 1, // Slide 3 -> audio-1 (Saya set lanjut lagu yg sama, atau ganti jadi 0 jika mau)
-            3: 2, // Slide 4 (Papa) -> audio-2 (Lagu Michael Bolton START)
-            4: 2, // Slide 5 (Kue) -> audio-2 (Lagu Michael Bolton LANJUT)
+            0: 0, // Slide 1 (Intro) -> lagu1
+            1: 1, // Slide 2 -> lagu2
+            2: 1, // Slide 3 -> lagu2
+            3: 2, // Slide 4 (Papa) -> lagu3
+            4: 2, // Slide 5 (Kue) -> lagu3
         };
 
-        // === CONFIGURATION ===
-        const slideDuration = 11000; 
+        const slideDuration = 11000; // 11 Detik per slide
         
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
@@ -156,9 +154,9 @@
         
         let slideInterval;
         let isPaused = false;
-        let currentPlayingId = null; // Menyimpan ID lagu yang sedang main
+        let currentPlayingId = null;
 
-        // --- FUNGSI AUDIO PINTAR (SMART AUDIO) ---
+        // --- FUNGSI AUDIO ---
         function stopAllAudioExcept(exceptionId) {
             for (let i = 0; i < 10; i++) { 
                 const audio = document.getElementById('audio-' + i);
@@ -172,20 +170,15 @@
         function playAudioForSlide(index) {
             const targetIndex = slideAudioMap[index];
             if (targetIndex === undefined) return;
-
             const targetId = 'audio-' + targetIndex;
 
-            // Jika lagu yang mau diputar SAMA dengan yang sedang main, BIARKAN LANJUT
             if (currentPlayingId === targetId) {
                 const audio = document.getElementById(targetId);
-                // Jaga-jaga kalau kepause
                 if(audio && audio.paused && !isPaused) audio.play();
                 return; 
             }
 
-            // Jika lagu BEDA, matikan yang lama, mainkan yang baru
             stopAllAudioExcept(targetId);
-
             const audio = document.getElementById(targetId);
             if (audio) {
                 audio.volume = 0.6;
@@ -229,44 +222,30 @@
         // --- NAVIGASI SLIDE ---
         function showSlide(index) {
             clearInterval(slideInterval); 
-
-            if (index >= totalSlides) {
-                currentSlide = 0; 
-            } else if (index < 0) {
-                currentSlide = 0;
-            } else {
-                currentSlide = index;
-            }
+            if (index >= totalSlides) { currentSlide = 0; } 
+            else if (index < 0) { currentSlide = 0; } 
+            else { currentSlide = index; }
 
             slides.forEach(slide => slide.classList.remove('active'));
             slides[currentSlide].classList.add('active');
             
-            // Update warna background (saya tambahkan bg-5 agar slide terakhir berwarna)
             const bgColors = ['#8c28c3', '#4e80ff', '#f5d75e', '#f94242', '#1db954'];
             container.style.background = bgColors[currentSlide] || '#121212';
 
-            if (!isPaused) {
-                playAudioForSlide(currentSlide);
-            }
-
+            if (!isPaused) playAudioForSlide(currentSlide);
             startProgress();
 
-            if (!isPaused) {
-                slideInterval = setInterval(nextSlide, slideDuration);
-            }
+            if (!isPaused) slideInterval = setInterval(nextSlide, slideDuration);
         }
 
         function nextSlide() { showSlide(currentSlide + 1); }
         function prevSlide() { showSlide(currentSlide - 1); }
 
-        // --- FITUR PAUSE ---
         function pauseStory() {
             isPaused = true;
             clearInterval(slideInterval); 
-            
             const activeFill = document.getElementById('fill-' + currentSlide);
             if(activeFill) activeFill.classList.add('paused');
-
             if (currentPlayingId) {
                 const audio = document.getElementById(currentPlayingId);
                 if (audio) audio.pause();
@@ -276,36 +255,65 @@
         function resumeStory() {
             if (!isPaused) return;
             isPaused = false;
-            
             const activeFill = document.getElementById('fill-' + currentSlide);
             if(activeFill) activeFill.classList.remove('paused');
-
             if (currentPlayingId) {
                 const audio = document.getElementById(currentPlayingId);
                 if (audio) audio.play();
             }
-
             slideInterval = setInterval(nextSlide, slideDuration); 
         }
 
-        // Event Listeners
-        const touchArea = document.querySelector('.nav-layer');
+        // ============================================================
+        //  LOGIKA KLIK & TAP (PASTI BERJALAN)
+        // ============================================================
         
-        touchArea.addEventListener('touchstart', (e) => { e.preventDefault(); pauseStory(); });
-        touchArea.addEventListener('touchend', (e) => { e.preventDefault(); resumeStory(); });
-        
-        touchArea.addEventListener('mousedown', pauseStory);
-        touchArea.addEventListener('mouseup', resumeStory);
-        touchArea.addEventListener('mouseleave', resumeStory);
+        const btnPrev = document.getElementById('btnPrev');
+        const btnNext = document.getElementById('btnNext');
+        let pressStartTime = 0;
 
-        document.getElementById('btnPrev').addEventListener('click', (e) => {
-            e.stopPropagation(); 
-            resumeStory(); prevSlide();
-        });
-        document.getElementById('btnNext').addEventListener('click', (e) => {
-            e.stopPropagation();
-            resumeStory(); nextSlide();
-        });
+        // Fungsi ini menangani Mouse (PC) dan Touch (HP) sekaligus
+        function setupInteraction(element, actionCallback) {
+            
+            // 1. Saat ditekan (Mouse Klik Kiri / Jari Nempel)
+            //    -> Langsung Pause
+            const startAction = (e) => {
+                // e.preventDefault(); // Kita matikan preventDefault di start agar mouse tetap terasa natural
+                pressStartTime = Date.now(); 
+                pauseStory();
+            };
+
+            // 2. Saat dilepas (Mouse Klik Lepas / Jari Angkat)
+            //    -> Resume, dan Cek apakah itu "Klik Cepat" atau "Tahan Lama"
+            const endAction = (e) => {
+                e.preventDefault(); // Mencegah zoom/scroll aneh-aneh di HP saat lepas
+                resumeStory();
+                
+                const duration = Date.now() - pressStartTime;
+                
+                // Jika ditekan kurang dari 0.3 detik, anggap sebagai KLIK (Ganti Slide)
+                // Jika lebih dari itu, anggap user sedang menahan untuk baca (Jangan ganti slide)
+                if (duration < 300) {
+                    actionCallback();
+                }
+            };
+
+            // Event Listeners untuk HP
+            element.addEventListener('touchstart', startAction, { passive: false });
+            element.addEventListener('touchend', endAction, { passive: false });
+
+            // Event Listeners untuk PC (Mouse)
+            element.addEventListener('mousedown', startAction);
+            element.addEventListener('mouseup', endAction);
+            
+            // Jika mouse keluar area saat ditahan, resume saja
+            element.addEventListener('mouseleave', resumeStory);
+        }
+
+        // Pasang fungsi ke tombol Kiri dan Kanan
+        setupInteraction(btnPrev, prevSlide);
+        setupInteraction(btnNext, nextSlide);
+
 
         // --- START ---
         function startExperience() {
@@ -313,7 +321,6 @@
             initProgressBars();
             showSlide(0); 
         }
-
     </script>
 </body>
 </html>
