@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Untuk Bela</title>
+    <style>
+        /* --- CSS DASAR --- */
+        body {
+            margin: 0; padding: 0; background-color: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white; display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden; user-select: none;
+        }
+
+        .phone-container {
+            width: 100%; max-width: 400px; height: 100%; max-height: 800px;
+            position: relative; background: #121212; display: flex; flex-direction: column;
+        }
+
+        /* --- PROGRESS BAR --- */
+        .progress-container {
+            display: flex; padding: 10px; gap: 5px; position: absolute; top: 0; width: 100%; box-sizing: border-box; z-index: 10;
+        }
+        .progress-bar {
+            height: 4px; background-color: rgba(255, 255, 255, 0.3); flex: 1; border-radius: 2px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; background-color: white; width: 0%;
+        }
+
+        @keyframes fillBar { from { width: 0%; } to { width: 100%; } }
+        .animating { animation-name: fillBar; animation-timing-function: linear; animation-fill-mode: forwards; }
+        .paused { animation-play-state: paused !important; }
+
+        /* --- SLIDE CONTENT --- */
+        .slide {
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            height: 100%; padding: 20px; text-align: center; animation: fadeIn 0.5s ease;
+        }
+        .slide.active { display: flex; }
+
+        h1 { font-size: 3em; font-weight: 800; margin-bottom: 10px; color: #1db954; }
+        h2 { font-size: 1.5em; font-weight: 600; margin-bottom: 20px; }
+        p { font-size: 1.2em; line-height: 1.5; }
+        
+        .photo-frame {
+            width: 250px; height: 250px; object-fit: cover; border-radius: 10px; margin: 20px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Warna Background per Slide */
+        .bg-1 { background-color: #8c28c3; }
+        .bg-2 { background-color: #4e80ff; }
+        .bg-3 { background-color: #f5d75e; }
+        .bg-4 { background-color: #f94242; }
+        .bg-5 { background-color: #1db954; }
+
+        /* --- NAVIGASI --- */
+        .nav-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; z-index: 20;
+        }
+        .nav-left, .nav-right { flex: 1; }
+
+        /* --- OVERLAY PEMBUKA --- */
+        #startOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+        }
+        .start-btn {
+            padding: 15px 40px; font-size: 1.5em; background: #1db954; color: white;
+            border: none; border-radius: 50px; cursor: pointer; font-weight: bold; margin-top: 20px;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <audio id="audio-0" loop><source src="B:\Kartu_Ucapan\KadoBela\wwd.mp3juice.blog - Coldplay - A Sky Full of Stars (192 KBps).mp3" type="audio/mpeg"></audio>
+    <audio id="audio-1" loop><source src="B:\Kartu_Ucapan\KadoBela\wwd.mp3juice.blog - Tulus - Manusia Kuat (192 KBps).mp3" type="audio/mpeg"></audio>
+    <audio id="audio-2" loop><source src="B:\Kartu_Ucapan\KadoBela\wwd.mp3juice.blog - Michael Bolton - Fathers Daughters (192 KBps).mp3" type="audio/mpeg"></audio>
+
+    <div id="startOverlay">
+        <h1 style="color: white;">🎁</h1>
+        <h2 style="color: white;">Ada Kado Buat Adek</h2>
+        <button class="start-btn" onclick="startExperience()">Buka Sekarang</button>
+    </div>
+
+    <div class="phone-container" id="mainContainer">
+        <div class="progress-container" id="progressContainer"></div>
+
+        <div class="nav-layer">
+            <div class="nav-left" id="btnPrev"></div>
+            <div class="nav-right" id="btnNext"></div>
+        </div>
+
+        <div class="slide active bg-1">
+            <h1>2025</h1>
+            <h2>Untuk Adik Tercinta</h2>
+            <p>Selamat Ulang Tahun</p>
+            <p>Ini kado dari abng</p>
+        </div>
+
+        <div class="slide bg-2">
+            <h2>Dari Abng Selamat ulang Tahun Ke 18</h2>
+            <p>Ngak terasa adek udah jadi calon dokter aja.<br>
+            Umur 17thn udah lewat aja semoga ditahun ini adek bahagia</p>
+            <img src="B:\Kartu_Ucapan\KadoBela\IMG_20191102_173310.jpg" alt="Foto Bela" class="photo-frame" onerror="this.style.display='none'">
+        </div>
+
+        <div class="slide bg-3">
+            <h2>Untuk Adek dari Abng</h2>
+            <p>Abng doa kan adek bisa mencapai mimpinya dan dilancarkan juga jalannya</p>
+            <img src="B:\Kartu_Ucapan\KadoBela\IMG-20200118-WA0007.jpg" alt="Foto Bela 2" class="photo-frame" onerror="this.style.display='none'">
+            <h2>Tetap Semangat untuk mengejar mimpinya ya!</h2>
+        </div>
+
+        <div class="slide bg-4">
+            <h2>Mungkin ada Orang yang adek sayang mau ngucapin juga</h2>
+            <img src="B:\Kartu_Ucapan\KadoBela\IMG20180403095237(1).jpg" alt="Foto Papa" class="photo-frame" onerror="this.style.display='none'">
+            <div style="text-align: justify ;background: rgba(166, 122, 60, 0.495); padding: 20px; border-radius: 10px; margin-top: 20px;">
+              <p>Ini dari papa adek jangan nangis lagi ya, papa bangga adek sekarang udah besar. 
+                <br>Nanti kita sama-sama cerita siapa diantara kita yang jadi dokter terhebat</p>
+            </div>
+        </div>
+
+        <div class="slide bg-5">
+            <h2>HBD!</h2>
+            <img src="B:\Kartu_Ucapan\KadoBela\IMG-20190812-WA0006.jpg" alt="Foto Bersama" class="photo-frame" onerror="this.style.display='none'">
+            <p>Kami Semua mengucappkan selamat ulang tahun Bela</p>
+            <p style="font-size: 0.8em; margin-top: 30px; opacity: 0.7;">Tap kiri/kanan untuk geser<br>Tahan layar untuk pause</p>
+        </div>
+    </div>
+
+    <script>
+        // === 1. KONFIGURASI PETA LAGU (PENTING) ===
+        // Kiri: Index Slide (Mulai dari 0) | Kanan: ID Audio
+        const slideAudioMap = {
+            0: 0, // Slide 1 -> audio-0
+            1: 1, // Slide 2 -> audio-1
+            2: 1, // Slide 3 -> audio-1 (Saya set lanjut lagu yg sama, atau ganti jadi 0 jika mau)
+            3: 2, // Slide 4 (Papa) -> audio-2 (Lagu Michael Bolton START)
+            4: 2, // Slide 5 (Kue) -> audio-2 (Lagu Michael Bolton LANJUT)
+        };
+
+        // === CONFIGURATION ===
+        const slideDuration = 11000; 
+        
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const container = document.getElementById('mainContainer');
+        const progressContainer = document.getElementById('progressContainer');
+        const totalSlides = slides.length;
+        
+        let slideInterval;
+        let isPaused = false;
+        let currentPlayingId = null; // Menyimpan ID lagu yang sedang main
+
+        // --- FUNGSI AUDIO PINTAR (SMART AUDIO) ---
+        function stopAllAudioExcept(exceptionId) {
+            for (let i = 0; i < 10; i++) { 
+                const audio = document.getElementById('audio-' + i);
+                if (audio && audio.id !== exceptionId) {
+                    audio.pause();
+                    audio.currentTime = 0; 
+                }
+            }
+        }
+
+        function playAudioForSlide(index) {
+            const targetIndex = slideAudioMap[index];
+            if (targetIndex === undefined) return;
+
+            const targetId = 'audio-' + targetIndex;
+
+            // Jika lagu yang mau diputar SAMA dengan yang sedang main, BIARKAN LANJUT
+            if (currentPlayingId === targetId) {
+                const audio = document.getElementById(targetId);
+                // Jaga-jaga kalau kepause
+                if(audio && audio.paused && !isPaused) audio.play();
+                return; 
+            }
+
+            // Jika lagu BEDA, matikan yang lama, mainkan yang baru
+            stopAllAudioExcept(targetId);
+
+            const audio = document.getElementById(targetId);
+            if (audio) {
+                audio.volume = 0.6;
+                audio.play().catch(e => console.log("Audio play error:", e));
+                currentPlayingId = targetId; 
+            }
+        }
+
+        // --- PROGRESS BAR ---
+        function initProgressBars() {
+            progressContainer.innerHTML = '';
+            slides.forEach((_, index) => {
+                let bar = document.createElement('div');
+                bar.className = 'progress-bar';
+                let fill = document.createElement('div');
+                fill.className = 'progress-fill';
+                fill.id = 'fill-' + index;
+                bar.appendChild(fill);
+                progressContainer.appendChild(bar);
+            });
+        }
+
+        function resetProgress() {
+            for (let i = 0; i < totalSlides; i++) {
+                let fill = document.getElementById('fill-' + i);
+                fill.classList.remove('animating'); 
+                fill.style.width = (i < currentSlide) ? '100%' : '0%';
+            }
+        }
+
+        function startProgress() {
+            resetProgress();
+            let fill = document.getElementById('fill-' + currentSlide);
+            if(fill) {
+                void fill.offsetWidth; 
+                fill.style.animationDuration = `${slideDuration}ms`;
+                fill.classList.add('animating');
+            }
+        }
+
+        // --- NAVIGASI SLIDE ---
+        function showSlide(index) {
+            clearInterval(slideInterval); 
+
+            if (index >= totalSlides) {
+                currentSlide = 0; 
+            } else if (index < 0) {
+                currentSlide = 0;
+            } else {
+                currentSlide = index;
+            }
+
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide].classList.add('active');
+            
+            // Update warna background (saya tambahkan bg-5 agar slide terakhir berwarna)
+            const bgColors = ['#8c28c3', '#4e80ff', '#f5d75e', '#f94242', '#1db954'];
+            container.style.background = bgColors[currentSlide] || '#121212';
+
+            if (!isPaused) {
+                playAudioForSlide(currentSlide);
+            }
+
+            startProgress();
+
+            if (!isPaused) {
+                slideInterval = setInterval(nextSlide, slideDuration);
+            }
+        }
+
+        function nextSlide() { showSlide(currentSlide + 1); }
+        function prevSlide() { showSlide(currentSlide - 1); }
+
+        // --- FITUR PAUSE ---
+        function pauseStory() {
+            isPaused = true;
+            clearInterval(slideInterval); 
+            
+            const activeFill = document.getElementById('fill-' + currentSlide);
+            if(activeFill) activeFill.classList.add('paused');
+
+            if (currentPlayingId) {
+                const audio = document.getElementById(currentPlayingId);
+                if (audio) audio.pause();
+            }
+        }
+
+        function resumeStory() {
+            if (!isPaused) return;
+            isPaused = false;
+            
+            const activeFill = document.getElementById('fill-' + currentSlide);
+            if(activeFill) activeFill.classList.remove('paused');
+
+            if (currentPlayingId) {
+                const audio = document.getElementById(currentPlayingId);
+                if (audio) audio.play();
+            }
+
+            slideInterval = setInterval(nextSlide, slideDuration); 
+        }
+
+        // Event Listeners
+        const touchArea = document.querySelector('.nav-layer');
+        
+        touchArea.addEventListener('touchstart', (e) => { e.preventDefault(); pauseStory(); });
+        touchArea.addEventListener('touchend', (e) => { e.preventDefault(); resumeStory(); });
+        
+        touchArea.addEventListener('mousedown', pauseStory);
+        touchArea.addEventListener('mouseup', resumeStory);
+        touchArea.addEventListener('mouseleave', resumeStory);
+
+        document.getElementById('btnPrev').addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            resumeStory(); prevSlide();
+        });
+        document.getElementById('btnNext').addEventListener('click', (e) => {
+            e.stopPropagation();
+            resumeStory(); nextSlide();
+        });
+
+        // --- START ---
+        function startExperience() {
+            document.getElementById('startOverlay').style.display = 'none';
+            initProgressBars();
+            showSlide(0); 
+        }
+
+    </script>
+</body>
+</html>
